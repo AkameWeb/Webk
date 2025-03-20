@@ -1,0 +1,183 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+   
+    <meta charset="UTF-8" />
+    <meta http-equiv="X-UA-Compatible" content="IE=edge" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>Магазин электроники GrouBar</title>
+    <title>Phone Catalog</title>
+     <link
+      href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0-alpha1/dist/css/bootstrap.min.css"
+      rel="stylesheet"
+      integrity="sha384-GLhlTQ8iRABdZLl6O3oVMWSktQOp6b7In1Zl3/Jr59b6EGGoI1aFkw7cmDA6j6gD"
+      crossorigin="anonymous"
+    />
+    <style>
+        table {
+            width: 100%;
+            border-collapse: collapse;
+        }
+        table, th, td {
+            border: 1px solid black;
+        }
+        th, td {
+            padding: 10px;
+            text-align: left;
+        }
+    </style>
+</head>
+<body>
+    <header>
+      <nav class="navbar navbar-expand-lg bg-body-tertiary">
+        <div class="container-xxl">
+          <a class="navbar-brand" href="#">Каталог добавления</a>
+          <button
+            class="navbar-toggler"
+            type="button"
+            data-bs-toggle="collapse"
+            data-bs-target="#navbarSupportedContent"
+            aria-controls="navbarSupportedContent"
+            aria-expanded="false"
+            aria-label="Toggle navigation"
+          >
+            <span class="navbar-toggler-icon"></span>
+          </button>
+          <div class="collapse navbar-collapse" id="navbarSupportedContent">
+            <ul class="navbar-nav me-auto mb-2 mb-lg-0">
+              <li class="nav-item">
+                <a class="nav-link" href="#"></a>
+              </li>
+              <li class="nav-item">
+                <a class="nav-link" href="#">Главная</a>
+              </li>
+              <li class="nav-item">
+                <a class="nav-link" href="#"></a>
+              </li>
+              <li class="nav-item dropdown">
+                <a
+                  class="nav-link dropdown-toggle"
+                  href="#"
+                  role="button"
+                  data-bs-toggle="dropdown"
+                  aria-expanded="false"
+                >
+                  Дополнительно
+                </a>
+                <ul class="dropdown-menu">
+                  <li>
+                    <a class="dropdown-item" href="Arenda.html"></a>
+                  </li>
+                  <li>
+                    <a class="dropdown-item" href="#"></a>
+                  </li>
+                  <li><hr class="dropdown-divider" /></li>
+                  <li>
+                    <a class="dropdown-item" href="#"></a>
+                  </li>
+                  <li>
+                    <a class="dropdown-item" href="http://localhost/WEBK/LogReg/registr.html">Регистрация и авторизация</a>
+                  </li>
+                </ul>
+              </li>
+            </ul>
+            <form class="d-flex" role="search">
+              <input
+                class="form-control me-2"
+                type="Поиск"
+                placeholder="Поиск"
+                aria-label="Search"
+              />
+              <button class="btn btn-outline-success" type="submit">
+                Поиск
+              </button>
+            </form>
+          </div>
+        </div>
+      </nav>
+    </header>
+    <h1>Каталог телефонов</h1>
+
+    <!-- Форма для добавления нового телефона -->
+    <form id="addPhoneForm">
+        <input type="text" id="name" placeholder="Name" required>
+        <input type="text" id="brand" placeholder="Brand" required>
+        <input type="number" step="0.1" id="screen_size" placeholder="Screen Size" required>
+        <input type="number" id="ram" placeholder="RAM (GB)" required>
+        <input type="number" id="storage" placeholder="Storage (GB)" required>
+        <input type="number" id="battery_capacity" placeholder="Battery Capacity (mAh)" required>
+        <input type="number" step="0.01" id="price" placeholder="Price ($)" required>
+        <button type="submit">Добавить телефон</button>
+    </form>
+
+    <!-- Таблица для отображения каталога -->
+    <table id="phoneTable">
+        <thead>
+            <tr>
+                <th>Name</th>
+                <th>Brand</th>
+                <th>Screen Size</th>
+                <th>RAM</th>
+                <th>Storage</th>
+                <th>Battery Capacity</th>
+                <th>Price</th>
+            </tr>
+        </thead>
+        <tbody>
+            <!-- Данные будут добавлены сюда через JavaScript -->
+        </tbody>
+    </table>
+
+    <script>
+        // Функция для загрузки данных о телефонах
+        async function loadPhones() {
+            const response = await fetch('api.php');
+            const phones = await response.json();
+            const tbody = document.querySelector("#phoneTable tbody");
+            tbody.innerHTML = phones.map(phone => `
+                <tr>
+                    <td>${phone.name}</td>
+                    <td>${phone.brand}</td>
+                    <td>${phone.screen_size}</td>
+                    <td>${phone.ram}</td>
+                    <td>${phone.storage}</td>
+                    <td>${phone.battery_capacity}</td>
+                    <td>${phone.price}</td>
+                </tr>
+            `).join('');
+        }
+
+        // Функция для добавления нового телефона
+        async function addPhone(event) {
+            event.preventDefault();
+            const phone = {
+                name: document.getElementById('name').value,
+                brand: document.getElementById('brand').value,
+                screen_size: parseFloat(document.getElementById('screen_size').value),
+                ram: parseInt(document.getElementById('ram').value),
+                storage: parseInt(document.getElementById('storage').value),
+                battery_capacity: parseInt(document.getElementById('battery_capacity').value),
+                price: parseFloat(document.getElementById('price').value)
+            };
+
+            const response = await fetch('api.php', {
+                method: 'POST',
+                headers: {
+                    'Content-Type': 'application/json'
+                },
+                body: JSON.stringify(phone)
+            });
+
+            const result = await response.json();
+            alert(result.message);
+            loadPhones(); // Обновляем каталог
+        }
+
+        // Загружаем данные при загрузке страницы
+        document.addEventListener('DOMContentLoaded', loadPhones);
+
+        // Обработка отправки формы
+        document.getElementById('addPhoneForm').addEventListener('submit', addPhone);
+    </script>
+</body>
+</html>
